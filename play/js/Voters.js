@@ -2,6 +2,23 @@
 ///////// TYPES OF VOTER ////////////
 /////////////////////////////////////
 
+// Modifications
+// so I wanted to make a graph that didn't have two distance axes but instead one distance axis and a popularity axis.  At first I wanted the popularity axis to represent how many votes the candidate gets relative to the others.  Imagine a triangle or mountain for each candidate.  The candidate's icon sits on top of the mountain.  The best support is directly underneath the candidate. For every voter at a particular x-coordinate, the altitude on each candidate's mountain is proportional to the chance that the voter supports them as a first choice candidate.  This was difficult, so I decided to take the easy way.
+// The easier way to do this is to change the distance function so that more popular candidates appear closer.  Each candidate sits on a parabola.  For each x-coordinate, the highest parabola wins the voter.
+function popularity_distance(dx,cy) {
+	// var dist = Math.abs(dx) + cy; // triangle
+	// cy is measured from the top, so being at the top adds no distance but as we get less popular, there is more distance between us and the candidates.
+	var dist = dx*dx*.01 + cy; // parabola is better because there are no sharp transitions.  The .01 comes from an average distance of about 100 pixels between candidate and voter.  So this should change with the size of the image.
+	// console.log(dist);
+	dist = Math.round(.5*(dist+Math.abs(dist)) * .5); //rectify
+	return dist
+	// return Math.sqrt(dx*dx+dy*dy);
+}
+// In the future, I'd like to add a broadness to each candidate.  This would just be a change to the .01 factor.  A candidate with broader appeal would have a smaller .01 factor.
+// Also, in the future, I'd like to have a uniform line of voters placed at the bottom of the arena so that it is simpler.  And also we can't drag them up and down.  Or left to right.
+// Also, I'd like to make an axes label on the vertical axis to say "popularity".
+// and the x-axis should say "political spectrum"
+
 function ScoreVoter(model){
 
 	var self = this;
@@ -26,7 +43,7 @@ function ScoreVoter(model){
 			var c = self.model.candidates[i];
 			var dx = c.x-x;
 			var dy = c.y-y;
-			var dist = Math.sqrt(dx*dx+dy*dy);
+			var dist = popularity_distance(dx,c.y); // Math.sqrt(dx*dx+dy*dy);    // I change the distance.
 			scores[c.id] = self.getScore(dist);
 		}
 		
@@ -96,7 +113,7 @@ function ApprovalVoter(model){
 			var c = self.model.candidates[i];
 			var dx = c.x-x;
 			var dy = c.y-y;
-			var dist = Math.sqrt(dx*dx+dy*dy);
+			var dist = popularity_distance(dx,c.y); // Math.sqrt(dx*dx+dy*dy);    // I change the distance.
 			if(dist<self.approvalRadius){
 				approved.push(c.id);
 			}
@@ -159,12 +176,12 @@ function RankedVoter(model){
 			var c1 = self.model.candidatesById[a];
 			var x1 = c1.x-x;
 			var y1 = c1.y-y;
-			var d1 = x1*x1+y1*y1;
+			var d1 = popularity_distance(x1,c1.y); // x1*x1+y1*y1;    // I change the distance.
 
 			var c2 = self.model.candidatesById[b];
 			var x2 = c2.x-x;
 			var y2 = c2.y-y;
-			var d2 = x2*x2+y2*y2;
+			var d2 = popularity_distance(x2,c2.y); // x2*x2+y2*y2;    // I change the distance.
 
 			return d1-d2;
 
@@ -237,7 +254,7 @@ function PluralityVoter(model){
 			var c = self.model.candidates[j];
 			var dx = c.x-x;
 			var dy = c.y-y;
-			var dist = dx*dx+dy*dy;
+			var dist = popularity_distance(dx,c.y); // dx*dx+dy*dy;    // I change the distance.
 			if(dist<closestDistance){
 				closestDistance = dist;
 				closest = c;
