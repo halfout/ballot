@@ -8,9 +8,9 @@
 function popularity_distance(dx,cy) {
 	// var dist = Math.abs(dx) + cy; // triangle
 	// cy is measured from the top, so being at the top adds no distance but as we get less popular, there is more distance between us and the candidates.
-	// var dist = dx*dx*.01 + cy; // parabola is better because there are no sharp transitions.  The .01 comes from an average distance of about 100 pixels between candidate and voter.  So this should change with the size of the image.
-	
-	var dist = Math.log(Math.abs(dx)+1) * 100 + cy; // cusp
+	var dist = dx*dx*.01 + cy; // parabola is better because there are no sharp transitions.  The .01 comes from an average distance of about 100 pixels between candidate and voter.  So this should change with the size of the image.
+	// The reason to choose parabolas is that the decision boundary changes linearly as the parabolas are moved around.  Linear is nice.  (As long as all the parabolas have the same curvature.. I mean the 'a' in 'a x ^ 2'.)  
+	// var dist = Math.log(Math.abs(dx)+1) * 100 + cy; // cusp
 	// console.log(dist);
 	dist = Math.round(.5*(dist+Math.abs(dist)) * .5); //rectify
 	return dist
