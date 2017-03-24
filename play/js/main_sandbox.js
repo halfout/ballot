@@ -80,9 +80,9 @@ function main(config){
 			if(num==1){
 				voterPositions = [[150,280]];
 			}else if(num==2){
-				voterPositions = [[150,100],[150,200]];
+				voterPositions = [[90,280],[210,280]];
 			}else if(num==3){
-				voterPositions = [[150,115],[115,180],[185,180]];
+				voterPositions = [[70,280],[150,280],[230,280]];
 			}
 			for(var i=0; i<num; i++){
 				var pos = voterPositions[i];
