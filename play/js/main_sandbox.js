@@ -431,7 +431,7 @@ function main(config){
 		};
 
 		// Put it in the save link box!
-		var link = "http://ncase.me/ballot/sandbox?m="+uri;
+		var link = "https://rawgit.com/halfout/ballot/gh-pages/sandbox/index.html?m="+uri;
 		var savelink = document.getElementById("savelink");
 		savelink.value = "saving...";
 		setTimeout(function(){
