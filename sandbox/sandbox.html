@@ -9,28 +9,28 @@
 	
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>ConvNetJS demo: Classify toy 2D data</title>
-<link href="./ConvNetJS demo_ Classify toy 2D data_files/css" rel="stylesheet" type="text/css">
-
+<link href="../ConvNetJS demo_ Classify toy 2D data_files/css" rel="stylesheet" type="text/css">
+<!-- 
 <script async="" src="http://www.google-analytics.com/analytics.js"></script><script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+ /* (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
   m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
   })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
   ga('create', 'UA-3698471-21', 'stanford.edu');
   ga('send', 'pageview');
-
+*/
 </script>
-
-<script src="./ConvNetJS demo_ Classify toy 2D data_files/jquery-1.8.3.min.js.download"></script>
-<script src="./ConvNetJS demo_ Classify toy 2D data_files/npgmain.js.download"></script>
-<script src="./ConvNetJS demo_ Classify toy 2D data_files/convnet.js.download"></script><style type="text/css">
+ -->
+<script src="../ConvNetJS demo_ Classify toy 2D data_files/jquery-1.8.3.min.js.download"></script>
+<script src="../ConvNetJS demo_ Classify toy 2D data_files/npgmain.js.download"></script>
+<script src="../ConvNetJS demo_ Classify toy 2D data_files/convnet.js.download"></script><style type="text/css">
 :root #header + #content > #left > #rlblock_left
 { display: none !important; }</style>
-<script src="./ConvNetJS demo_ Classify toy 2D data_files/util.js.download"></script>
+<script src="../ConvNetJS demo_ Classify toy 2D data_files/util.js.download"></script>
 <script type="text/javascript">
 
-var data, labels, N;
+var data, labels, N, color_labels;
 var ss = 50.0; // scale for drawing
 
 // create neural net
@@ -88,7 +88,12 @@ function original_data(){
   data = [];
   labels = [];
   
-  data.push([-0.4326  ,  1.1909 ]); labels.push(1);
+  for(point in model.tracer) {
+	data.push(point.slice(0,2));
+	labels.push(point[2]);
+	}
+  
+  /*data.push([-0.4326  ,  1.1909 ]); labels.push(1);
   data.push([3.0, 4.0]); labels.push(1);
   data.push([0.1253 , -0.0376   ]); labels.push(1);
   data.push([0.2877 ,   0.3273  ]); labels.push(1);
@@ -101,10 +106,19 @@ function original_data(){
   data.push([0.5 ,   3.2  ]); labels.push(1);
   data.push([0.8 ,   3.2  ]); labels.push(1);
   data.push([1.0 ,   -2.2  ]); labels.push(1);
+  */
   N = labels.length;
+  
+  
 }
 
+
+
+
 function circle_data() {
+
+  
+
   data = [];
   labels = [];
   for(var i=0;i<50;i++) {
@@ -124,6 +138,29 @@ function circle_data() {
 }
 
 function spiral_data() {
+data = [];
+  labels = [];
+  
+  var type_a  = {};
+  var i = 0;
+  color_labels = [];
+  for(k in model.tracer) {
+	data.push([model.tracer[k][0]/100-4,model.tracer[k][1]/100-4]);
+	var f_star = model.tracer[k][2] ;
+	console.log(f_star);
+	console.log(type_a);
+	if (!(f_star in type_a)) {
+		type_a[f_star] = i;
+		color_labels.push(f_star);
+		console.log(f_star);
+		i++;
+	}
+	labels.push(type_a[f_star]);
+  }
+  
+  N = labels.length;
+  
+/*
   data = [];
   labels = [];
   var n = 100;
@@ -140,7 +177,8 @@ function spiral_data() {
     labels.push(0);
   }
   N = data.length;
-}
+*/
+ }
  
 function update(){
   // forward prop the data
