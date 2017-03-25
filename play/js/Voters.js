@@ -26,7 +26,7 @@ function ScoreVoter(model){
 	var self = this;
 	self.model = model;
 
-	self.radiusStep = window.HACK_BIG_RANGE ? 74 : 30; // step: x<25, 25<x<50, 50<x<75, 75<x<100, 100<x
+	self.radiusStep = window.HACK_BIG_RANGE ? 30 : 30; // step: x<25, 25<x<50, 50<x<75, 75<x<100, 100<x
 
 	self.getScore = function(x){
 		var step = self.radiusStep;
@@ -34,7 +34,7 @@ function ScoreVoter(model){
 		if(x<step*2) return 4;
 		if(x<step*3) return 3;
 		if(x<step*4) return 2;
-		if(step*4<x) return 1;
+		if(step*4<=x) return 1;
 	};
 
 	self.getBallot = function(x, y){
@@ -45,7 +45,7 @@ function ScoreVoter(model){
 			var c = self.model.candidates[i];
 			var dx = c.x-x;
 			var dy = c.y-y;
-			var dist = popularity_distance(dx,c.y); // Math.sqrt(dx*dx+dy*dy);    // I change the distance.
+			var dist = Math.sqrt(Math.abs(popularity_distance(dx,c.y)*200))-40; // Math.sqrt(dx*dx+dy*dy);    // I change the distance.
 			scores[c.id] = self.getScore(dist);
 		}
 		

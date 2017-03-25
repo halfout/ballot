@@ -15,6 +15,7 @@ Election.score = function(model, options){
 			tally[candidate] += ballot[candidate];
 		}
 	});
+	
 	for(var candidate in tally){
 		tally[candidate] /= model.getTotalVoters();
 	}
@@ -410,7 +411,6 @@ function _tietext(winners) {
 		text += _icon(winners[i]); 
 	}
 	text += " tie<br>";
-	model.canvas.style.borderColor = "#000"; // BLACK.
 	text += "</span>";
 	text += "<br>";	
 	text += "<b>TIE</b>";
