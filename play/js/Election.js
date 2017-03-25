@@ -248,7 +248,7 @@ Election.irv = function(model, options){
 		var winners = _countWinner(tally);
 		var winner = winners[0];
 		var ratio = tally[winner]/model.getTotalVoters();
-		if(ratio>=0.5){
+		if(ratio>0.5){
 			if (winners.length >= 2) {		
 				finalWinner = "tie";
 				break;
@@ -261,7 +261,7 @@ Election.irv = function(model, options){
 		// Otherwise... runoff...
 		var losers = _countLoser(tally);
 		var loser = losers[0];
-		if (losers.length >= 2) {finalWinner = "tie"; break;}
+		if (losers.length >= 2) {finalWinner = "elimination tie"; break;}
 		text += "nobody's more than 50%. ";
 		text += "eliminate loser, "+_icon(loser)+". next round!<br><br>";
 
@@ -280,6 +280,10 @@ Election.irv = function(model, options){
 	if (finalWinner == "tie") {
 		model.canvas.style.borderColor = "#000"; // BLACK.
 		text += _tietext(winners);
+	} else if (finalWinner == "elimination tie") {
+		model.canvas.style.borderColor = "#000"; // BLACK.
+		text += "who is the loser?";
+		text += _tietext(losers);
 	} else {
 		// END!
 		var color = _colorWinner(model, finalWinner);
