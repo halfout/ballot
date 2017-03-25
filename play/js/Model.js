@@ -106,7 +106,6 @@ function Model(config){
 				var c = self.candidates[i];
 				var setnew = [c.x*2,c.y*2,fill];
 				tracernew.push(setnew);
-				console.log(self.tracerold[i]);
 				if (self.tracerold[i][0] != setnew[0] | self.tracerold[i][1] != setnew[1]) {				
 					self.tracer.push(setnew);
 					self.me_moving_new = i;
