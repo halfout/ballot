@@ -89,11 +89,23 @@ function Model(config){
 	self.update = function(){
 
 		// Clear it all!
-		ctx.clearRect(0,0,canvas.width,canvas.height);
+		// ctx.clearRect(0,0,canvas.width,canvas.height); // keep it if we are dragging something
 
 		// Move the one that's being dragged, if any
 		if(Mouse.dragging){
 			Mouse.dragging.moveTo(Mouse.x, Mouse.y);
+			var fill = model.canvas.style.borderColor; // this modification traces the history of who won
+			for(var i=0; i<self.candidates.length; i++){
+				var c = self.candidates[i];
+				
+				ctx.fillStyle = fill; // make a circle
+				ctx.beginPath();
+				var size = 50;
+				ctx.arc(c.x*2, c.y*2, size, 0, Math.TAU, true);
+				ctx.fill();
+			}
+		} else {
+			ctx.clearRect(0,0,canvas.width,canvas.height);
 		}
 
 		// DRAW 'EM ALL.
