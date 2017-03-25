@@ -138,6 +138,8 @@ function Model(config){
 			ctx.fill();
 		}
 		
+		spiral_data();
+		
 		for(var i=0; i<self.voters.length; i++){
 			var voter = self.voters[i];
 			voter.update();
