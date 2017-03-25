@@ -82,34 +82,63 @@ function Model(config){
 		self.voters = [];
 		self.draggables = [];
 		if(!noInit) self.init();
+		self.tracer = [];
 	};
 
 	// Update!
 	self.onUpdate = function(){}; // TO IMPLEMENT
+	self.tracerold = Array.apply(null, Array(5)).map(function(){return [0,0,0]});
+	self.me_moving_new = 0;
+	self.tracer = Array.apply(null, Array(50)).map(function(){return [0,0,0]});
+	//self.tracer = [];
 	self.update = function(){
-
+	
 		// Clear it all!
-		// ctx.clearRect(0,0,canvas.width,canvas.height); // keep it if we are dragging something
+		ctx.clearRect(0,0,canvas.width,canvas.height); // keep it if we are dragging something
 
 		// Move the one that's being dragged, if any
 		if(Mouse.dragging){
 			Mouse.dragging.moveTo(Mouse.x, Mouse.y);
 			var fill = model.canvas.style.borderColor; // this modification traces the history of who won
+			var tracernew = []
+			self.me_moving_old = self.me_moving_new;
 			for(var i=0; i<self.candidates.length; i++){
 				var c = self.candidates[i];
-				
-				ctx.fillStyle = fill; // make a circle
-				ctx.beginPath();
-				var size = 50;
-				ctx.arc(c.x*2, c.y*2, size, 0, Math.TAU, true);
-				ctx.fill();
+				var setnew = [c.x*2,c.y*2,fill];
+				tracernew.push(setnew);
+				console.log(self.tracerold[i]);
+				if (self.tracerold[i][0] != setnew[0] | self.tracerold[i][1] != setnew[1]) {				
+					self.tracer.push(setnew);
+					self.me_moving_new = i;
+				}
 			}
+			self.tracerold = tracernew;
+			if (self.me_moving_new != self.me_moving_old) {
+				self.tracer = [];
+			}
+			self.tracer = self.tracer.slice(-400);
+			//self.tracer.splice(0,Math.abs(self.tracer.length-10));
 		} else {
-			ctx.clearRect(0,0,canvas.width,canvas.height);
+			self.tracer = [];
 		}
 
 		// DRAW 'EM ALL.
 		// Draw voters' BG first, then candidates, then voters.
+		
+		// Draw tracer
+		for(var i=0; i<self.tracer.length; i++){
+			var trace = self.tracer[i];
+			x = trace[0];
+			y = trace[1];
+			fill = trace[2];
+			ctx.fillStyle = fill; // make a circle
+			ctx.beginPath();
+			var size = 10;
+			ctx.fillRect(x-size/2, y-size/2, size, size);
+			//ctx.arc(x, y, size, 0, Math.TAU, true);
+			ctx.fill();
+		}
+		
 		for(var i=0; i<self.voters.length; i++){
 			var voter = self.voters[i];
 			voter.update();
