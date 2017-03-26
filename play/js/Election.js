@@ -402,7 +402,7 @@ var _countLoser = function(tally){
 
 var _colorWinner = function(model, winner){
 	if (winner == "tie" | winner == "elimination tie") {
-		var color = "#000"; // BLACK.
+		var color = "#ccc"; // grey
 	} else {
 		var color = (winner) ? Candidate.graphics[winner].fill : "";
 	}

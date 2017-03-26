@@ -93,20 +93,27 @@ function Model(config){
 	self.winnerColor = [];
 	self.tracernewfromelection = Array.apply(null, Array(5)).map(function(){return [0,0,'rgb(0,0,0)']});
 	//self.tracer = [];
+	self.hasyee = false;
+	
+	self.gridx = [];
+	self.gridy = [];
+	self.gridl = [];
 	self.update = function(){
 	
 		// Clear it all!
 		ctx.clearRect(0,0,canvas.width,canvas.height); // keep it if we are dragging something
-
+		
+		var density= 10.0;
+				
 		// Move the one that's being dragged, if any
 		if(Mouse.dragging){
 			Mouse.dragging.moveTo(Mouse.x, Mouse.y);
-			for(var i=0; i<self.voters.length; i++){
-				var voter = self.voters[i];
+			for(var j=0; j<self.voters.length; j++){
+				var voter = self.voters[j];
 				voter.update();
 			}
-			for(var i=0; i<self.candidates.length; i++){
-				var c = self.candidates[i];
+			for(var j=0; j<self.candidates.length; j++){
+				var c = self.candidates[j];
 				c.update();
 			}
 			
@@ -117,9 +124,37 @@ function Model(config){
 					self.me_moving_new = i;
 				}
 			}
+			i--;
 			self.tracerold = self.tracernewfromelection; // clean up for next time
-			if (self.me_moving_new != self.me_moving_old) { // if we changed shapes, then erase tracer history
-				self.tracer = [];
+			if (self.me_moving_new != self.me_moving_old) { 
+				self.tracer = []; // if we changed shapes, then erase tracer history
+				
+				WIDTH = ctx.canvas.width; // draw yee diagram
+				HEIGHT = ctx.canvas.height;
+				oldx = Mouse.dragging.x;
+				oldy = Mouse.dragging.y;
+				self.gridx = [];
+				self.gridy = [];
+				self.gridl = []; 
+				for(var x=0.0, cx=0; x<=WIDTH; x+= density, cx++) {
+				  for(var y=0.0, cy=0; y<=HEIGHT; y+= density, cy++) {
+					Mouse.dragging.x = x*.5;
+					Mouse.dragging.y = y*.5;  // don't use Draggable.moveTo because it adds an offset
+					model.election(model, {sidebar:false});
+ 					for(var j=0; j<self.voters.length; j++){
+ 						var voter = self.voters[j];
+ 						voter.update();
+ 					}
+					var a = self.tracernewfromelection[self.me_moving_new][2];
+				    self.gridx.push(x);
+				    self.gridy.push(y);
+				    self.gridl.push(a);
+					// model.caption.innerHTML = "Calculating " + Math.round(x/WIDTH*100) + "%"; // doesn't work yet 
+				  }
+				}
+				Mouse.dragging.x = oldx;
+				Mouse.dragging.y = oldy;
+				self.hasyee=true;
 			}
 			//self.tracer = self.tracer.slice(-400); // keep tracer short
 			spiral_data(); // give the additional data from the tracer to the neural net nn
@@ -134,8 +169,15 @@ function Model(config){
 		// Draw voters' BG first, then candidates, then voters.
 		
 		// Draw nn
-		draw2();
+		// draw2();
 		
+		if(self.hasyee){
+			for(var k=0;k<self.gridx.length;k++) {
+				ctx.fillStyle = self.gridl[k];
+				ctx.fillRect(self.gridx[k]-density*.5-1, self.gridy[k]-density*.5-1, density+2, density+2);
+			}
+		}	
+
 		// Draw tracer
 		ctx.strokeStyle = 'rgb(0,0,0)';
 		ctx.lineWidth = 1;
