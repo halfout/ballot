@@ -103,14 +103,23 @@ function Model(config){
 	self.counter = 0;
 	self.doingyee = false;
 	self.dynamicyee = false;
+	self.yeeon = true;
 	self.TurnOnYee = function() {
 		self.dynamicyee = true;
+		self.yeeon = true;
 		model.update();
 	}	
 	self.TurnOffYee = function() {
 		self.dynamicyee = false;
+		self.yeeon = true;
 		model.update();
 	}	
+	self.TurnOffYeeAllTheWay = function() {
+		self.dynamicyee = false;
+		self.yeeon = false;
+		model.update();
+	}	
+	self.votersmovedold = 0;
 	self.update = function(){
 	
 		// Clear it all!
@@ -156,8 +165,10 @@ function Model(config){
 		if (!mouse_move) {
 			self.config_new = [self.numOfCandidates*1,self.numofVoters*1,self.voterType.name+"id"];
 		}
+		var votersmoved = !!Mouse.dragging ? (Mouse.dragging.hasOwnProperty("ballots") ? 1 : 0 ): 0;
 		var configchanged = self.config_old != self.config_new;
-		if ( !mouse_move | (newshape | configchanged ) ) {  // figure out if we need to recalculate the yee diagram
+		var votersbecamemobile = (votersmoved & !self.votersmovedold) | dynamic_yee;
+		if ( !mouse_move | (newshape | configchanged ) | votersbecamemobile ) {  // figure out if we need to recalculate the yee diagram
 			//  if we changed which shape we are dragging,
 			// or if we are updating and we haven't moved (which means a configuration changed)
 			self.tracer = []; // if we changed shapes, then erase tracer history
@@ -177,51 +188,56 @@ function Model(config){
 					oldy = self.candidates[self.me_moving_new].y
 				}
 			}
-			self.doingyee = true;
-			self.gridx = [];
-			self.gridy = [];
-			self.gridl = []; 
-			for(var x=0.0, cx=0; x<=WIDTH; x+= density, cx++) {
-			  for(var y=0.0, cy=0; y<=HEIGHT; y+= density, cy++) {
+			if (self.yeeon) {
+				self.doingyee = true;
+				self.gridx = [];
+				self.gridy = [];
+				self.gridl = []; 
+				for(var x=0.0, cx=0; x<=WIDTH; x+= density, cx++) {
+				  for(var y=0.0, cy=0; y<=HEIGHT; y+= density, cy++) {
+					if(dynamic_yee) {
+						self.candidates[1].x = x*.5;
+						self.candidates[1].y = y*.5;
+					} else {
+						if(mouse_move) {
+							Mouse.dragging.x = x*.5;
+							Mouse.dragging.y = y*.5;  // don't use Draggable.moveTo because it adds an offset
+						} else {
+							self.candidates[self.me_moving_new].x = x*.5;
+							self.candidates[self.me_moving_new].y = y*.5;
+						}
+					}
+					model.election(model, {sidebar:false});
+					for(var j=0; j<self.voters.length; j++){
+						var voter = self.voters[j];
+						voter.update();
+					}
+					var a = self.tracernewfromelection[self.me_moving_new][2];
+					self.gridx.push(x);
+					self.gridy.push(y);
+					self.gridl.push(a);
+					// model.caption.innerHTML = "Calculating " + Math.round(x/WIDTH*100) + "%"; // doesn't work yet 
+				  }
+				}
+				self.doingyee = false;
 				if(dynamic_yee) {
-					self.candidates[1].x = x*.5;
-					self.candidates[1].y = y*.5;
+					self.candidates[1].x = oldx;
+					self.candidates[1].y = oldy;
 				} else {
 					if(mouse_move) {
-						Mouse.dragging.x = x*.5;
-						Mouse.dragging.y = y*.5;  // don't use Draggable.moveTo because it adds an offset
+						Mouse.dragging.x = oldx;
+						Mouse.dragging.y = oldy;  // don't use Draggable.moveTo because it adds an offset
 					} else {
-						self.candidates[self.me_moving_new].x = x*.5;
-						self.candidates[self.me_moving_new].y = y*.5;
+						self.candidates[self.me_moving_new].x = oldx;
+						self.candidates[self.me_moving_new].y = oldy;
 					}
 				}
-				model.election(model, {sidebar:false});
-				for(var j=0; j<self.voters.length; j++){
-					var voter = self.voters[j];
-					voter.update();
-				}
-				var a = self.tracernewfromelection[self.me_moving_new][2];
-				self.gridx.push(x);
-				self.gridy.push(y);
-				self.gridl.push(a);
-				// model.caption.innerHTML = "Calculating " + Math.round(x/WIDTH*100) + "%"; // doesn't work yet 
-			  }
+				self.hasyee=true; // in development
 			}
-			self.doingyee = false;
-			if(dynamic_yee) {
-				self.candidates[1].x = oldx;
-				self.candidates[1].y = oldy;
-			} else {
-				if(mouse_move) {
-					Mouse.dragging.x = oldx;
-					Mouse.dragging.y = oldy;  // don't use Draggable.moveTo because it adds an offset
-				} else {
-					self.candidates[self.me_moving_new].x = oldx;
-					self.candidates[self.me_moving_new].y = oldy;
-				}
-			}
-			self.hasyee=true;
-		}
+		} 
+		
+		self.votersmovedold = votersmoved;
+		
 		if (mouse_move) {
 		self.tracerold = self.tracernewfromelection; // clean up for next time
 		}
@@ -231,7 +247,7 @@ function Model(config){
 		// DRAW 'EM ALL.
 		// Draw voters' BG first, then candidates, then voters.
 		
-		if(self.hasyee){
+		if(self.yeeon & self.hasyee){
 			for(var k=0;k<self.gridx.length;k++) {
 				ctx.fillStyle = self.gridl[k];
 				ctx.fillRect(self.gridx[k]-density*.5-1, self.gridy[k]-density*.5-1, density+2, density+2);
