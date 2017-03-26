@@ -8,7 +8,7 @@
 	<link rel="stylesheet" type="text/css" href="css/sandbox.css">
 	
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>ConvNetJS demo: Classify toy 2D data</title>
+
 <link href="../ConvNetJS demo_ Classify toy 2D data_files/css" rel="stylesheet" type="text/css">
 <!-- 
 <script async="" src="http://www.google-analytics.com/analytics.js"></script><script>
@@ -44,7 +44,7 @@ layer_defs = [];\n\
 layer_defs.push({type:'input', out_sx:1, out_sy:1, out_depth:2});\n\
 layer_defs.push({type:'fc', num_neurons:6, activation: 'tanh'});\n\
 layer_defs.push({type:'fc', num_neurons:2, activation: 'tanh'});\n\
-layer_defs.push({type:'softmax', num_classes:5});\n\
+layer_defs.push({type:'softmax', num_classes:6});\n\
 \n\
 net = new convnetjs.Net();\n\
 net.makeLayers(layer_defs);\n\
@@ -454,7 +454,8 @@ input[type="submit"]
 	<div id="left"></div>
 	<div id="center"></div>
 	<div id="right"></div>
-	
+	<p>.</p><p>.</p><p>.</p><p>.</p><p>.</p><p>.</p><p>.</p><p>.</p><p><input id="buttontp" type="submit" value="restart prediction model" onclick="reload();" style="width: 300px; height: 50px;">
+.</p><p>.</p><p>.</p><p>.</p><p>.</p>
 <div id="wrap">
 <h1><a href="http://cs.stanford.edu/people/karpathy/convnetjs">ConvnetJS</a> demo: toy 2d classification with 2-layer neural network</h1>
 

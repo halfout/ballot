@@ -87,10 +87,11 @@ function Model(config){
 
 	// Update!
 	self.onUpdate = function(){}; // TO IMPLEMENT
-	self.tracerold = Array.apply(null, Array(5)).map(function(){return [0,0,0]});
+	self.tracerold = Array.apply(null, Array(5)).map(function(){return [0,0,'rgb(0,0,0)']});
 	self.me_moving_new = 0;
-	self.tracer = Array.apply(null, Array(50)).map(function(){return [0,0,0]});
+	self.tracer = Array.apply(null, Array(5)).map(function(){return [0,0,'rgb(0,0,0)']});
 	self.winnerColor = [];
+	self.tracernewfromelection = Array.apply(null, Array(5)).map(function(){return [0,0,'rgb(0,0,0)']});
 	//self.tracer = [];
 	self.update = function(){
 	
@@ -100,26 +101,28 @@ function Model(config){
 		// Move the one that's being dragged, if any
 		if(Mouse.dragging){
 			Mouse.dragging.moveTo(Mouse.x, Mouse.y);
-			var fill = model.canvas.style.borderColor;
-			var fill = self.winnerColor[0]; //_clone(self.winnerColor); // this modification traces the history of who won
-			var tracernew = []
-			self.me_moving_old = self.me_moving_new;
+			for(var i=0; i<self.voters.length; i++){
+				var voter = self.voters[i];
+				voter.update();
+			}
 			for(var i=0; i<self.candidates.length; i++){
 				var c = self.candidates[i];
-				var setnew = [c.x*2,c.y*2,fill];
-				tracernew.push(setnew);
-				if (self.tracerold[i][0] != setnew[0] | self.tracerold[i][1] != setnew[1]) {				
-					self.tracer.push(setnew);
+				c.update();
+			}
+			
+			self.me_moving_old = self.me_moving_new;
+			for(var i=0; i<self.candidates.length; i++){ // see if the new tracer is in a different position.  only keep new positions.
+				if (self.tracerold[i][0] != self.tracernewfromelection[i][0] | self.tracerold[i][1] != self.tracernewfromelection[i][1]) {				
+					self.tracer.push(self.tracernewfromelection[i]);
 					self.me_moving_new = i;
 				}
 			}
-			self.tracerold = tracernew;
-			if (self.me_moving_new != self.me_moving_old) {
+			self.tracerold = self.tracernewfromelection; // clean up for next time
+			if (self.me_moving_new != self.me_moving_old) { // if we changed shapes, then erase tracer history
 				self.tracer = [];
 			}
-			self.tracer = self.tracer.slice(-400);
-			//self.tracer.splice(0,Math.abs(self.tracer.length-10));
-			spiral_data(); // get the additional data from dragging
+			//self.tracer = self.tracer.slice(-400); // keep tracer short
+			spiral_data(); // give the additional data from the tracer to the neural net nn
 		} else {
 			if ( ! flag_dont_clear_tracer) {self.tracer = [];ctx.clearRect(0,0,canvas.width,canvas.height);}
 			flag_dont_clear_tracer = false;

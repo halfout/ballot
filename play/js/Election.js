@@ -21,7 +21,6 @@ Election.score = function(model, options){
 	}
 	var winners = _countWinner(tally);
 	var winner = winners[0];
-	var color = _colorWinner(model, winner);
 
 
 	// Caption
@@ -34,9 +33,10 @@ Election.score = function(model, options){
 	}
 	if(!winner | winners.length>=2){
 		// NO WINNER?! OR TIE?!?!
-		model.canvas.style.borderColor = "#000"; // BLACK.
+		var color = _colorWinner(model, "tie");
 		text += _tietext(winners);
 	} else {
+		var color = _colorWinner(model, winner);
 		text += "<br>";
 		text += _icon(winner)+" has the highest score, so...<br>";
 		text += "</span>";
@@ -56,7 +56,6 @@ Election.approval = function(model, options){
 	});
 	var winners = _countWinner(tally);
 	var winner = winners[0];
-	var color = _colorWinner(model, winner);
 
 	
 	// Caption
@@ -69,9 +68,10 @@ Election.approval = function(model, options){
 	}
 	if(!winner | winners.length>=2){
 		// NO WINNER?! OR TIE?!?!
-		model.canvas.style.borderColor = "#000"; // BLACK.
+		var color = _colorWinner(model, "tie");
 		text += _tietext(winners);
 	} else {
+		var color = _colorWinner(model, winner);
 		text += "<br>";
 		text += _icon(winner)+" is most approved, so...<br>";
 		text += "</span>";
@@ -152,10 +152,10 @@ Election.condorcet = function(model, options){
 		text += "<br>";
 		text += "<b style='color:"+color+"'>"+topWinner.toUpperCase()+"</b> WINS";
 	}else if (topWinners.length >= 2) {
-		model.canvas.style.borderColor = "#000"; // BLACK.
+		var color = _colorWinner(model, "tie");
 		text += _tietext(topWinners);
 	} else {
-		model.canvas.style.borderColor = "#000"; // BLACK.
+		var color = _colorWinner(model, "tie");
 		text += "NOBODY beats everyone else in one-on-one races.<br>";
 		text += "</span>";
 		text += "<br>";
@@ -180,7 +180,6 @@ Election.borda = function(model, options){
 	});
 	var winners = _countLoser(tally); // LOWER score is best!
 	var winner = winners[0];
-	var color = _colorWinner(model, winner);
 
 	// Caption
 	var text = "";
@@ -192,9 +191,10 @@ Election.borda = function(model, options){
 	}
 	if(!winner | winners.length>=2){
 		// NO WINNER?! OR TIE?!?!
-		model.canvas.style.borderColor = "#000"; // BLACK.
+		var color = _colorWinner(model, "tie");
 		text += _tietext(winners);
 	}else{		
+		var color = _colorWinner(model, winner);
 		text += "<br>";
 		text += _icon(winner)+" has the <i>lowest</i> score, so...<br>";
 		text += "</span>";
@@ -278,10 +278,10 @@ Election.irv = function(model, options){
 	
 	}
 	if (finalWinner == "tie") {
-		model.canvas.style.borderColor = "#000"; // BLACK.
+		var color = _colorWinner(model, "tie");
 		text += _tietext(winners);
 	} else if (finalWinner == "elimination tie") {
-		model.canvas.style.borderColor = "#000"; // BLACK.
+		var color = _colorWinner(model, "tie");
 		text += "who is the loser?";
 		text += _tietext(losers);
 	} else {
@@ -304,7 +304,6 @@ Election.plurality = function(model, options){
 	});
 	var winners = _countWinner(tally);
 	var winner = winners[0];
-	var color = _colorWinner(model, winner);
 
 	// Caption
 	var text = "";
@@ -324,6 +323,7 @@ Election.plurality = function(model, options){
 	}
 	// Caption text for winner, or tie
 	if (winners.length == 1) {
+		var color = _colorWinner(model, winner);
 		if(options.sidebar){
 			text += "<br>";
 			text += _icon(winner)+" has most votes, so...<br>";
@@ -332,7 +332,7 @@ Election.plurality = function(model, options){
 		text += "<br>";
 		text += "<b style='color:"+color+"'>"+winner.toUpperCase()+"</b> WINS";
 	} else {
-		model.canvas.style.borderColor = "#000"; // BLACK.
+		var color = _colorWinner(model, "tie");
 		text += _tietext(winners);
 	}
 	
@@ -401,10 +401,22 @@ var _countLoser = function(tally){
 }
 
 var _colorWinner = function(model, winner){
-	var color = (winner) ? Candidate.graphics[winner].fill : "";
-	model.canvas.style.borderColor = color;
+	if (winner == "tie" | winner == "elimination tie") {
+		var color = "#000"; // BLACK.
+	} else {
+		var color = (winner) ? Candidate.graphics[winner].fill : "";
+	}
 	model.winnerColor[0] = color;
+	model.tracernewfromelection = [];
+	for(var i=0; i<model.candidates.length; i++){
+		var c = model.candidates[i];
+		var setnew = [c.x*2,c.y*2,color];
+		model.tracernewfromelection.push(setnew);
+	}
+	model.canvas.style.borderColor = color;
 	return color;
+	// I notice that I never add any ties to the tracer
+	// so the pattern recognition handles ties.
 }
 
 function _tietext(winners) {
