@@ -88,16 +88,14 @@ function Model(config){
 	// Update!
 	self.onUpdate = function(){}; // TO IMPLEMENT
 	self.tracerold = Array.apply(null, Array(5)).map(function(){return [0,0,'rgb(0,0,0)']});
+	self.tracernewfromelection = self.tracerold;	
+	self.tracer = self.tracerold;
 	self.me_moving_new = 0;
-	self.tracer = Array.apply(null, Array(5)).map(function(){return [0,0,'rgb(0,0,0)']});
-	self.winnerColor = [];
-	self.tracernewfromelection = Array.apply(null, Array(5)).map(function(){return [0,0,'rgb(0,0,0)']});
-	//self.tracer = [];
 	self.hasyee = false;
-	
 	self.gridx = [];
 	self.gridy = [];
 	self.gridl = [];
+
 	self.update = function(){
 	
 		// Clear it all!
@@ -157,19 +155,12 @@ function Model(config){
 				self.hasyee=true;
 			}
 			//self.tracer = self.tracer.slice(-400); // keep tracer short
-			spiral_data(); // give the additional data from the tracer to the neural net nn
 		} else {
-			if ( ! flag_dont_clear_tracer) {self.tracer = [];ctx.clearRect(0,0,canvas.width,canvas.height);}
-			flag_dont_clear_tracer = false;
+			self.tracer = [];
 		}
 
-		
-		
 		// DRAW 'EM ALL.
 		// Draw voters' BG first, then candidates, then voters.
-		
-		// Draw nn
-		// draw2();
 		
 		if(self.hasyee){
 			for(var k=0;k<self.gridx.length;k++) {
@@ -180,18 +171,18 @@ function Model(config){
 
 		// Draw tracer
 		ctx.strokeStyle = 'rgb(0,0,0)';
-		ctx.lineWidth = 1;
+		ctx.lineWidth = 1; // border around tracer
     
+		var size_radius = 5;
+		var trace, x, y, fill;
 		for(var i=0; i<self.tracer.length; i++){
-			var trace = self.tracer[i];
+			trace = self.tracer[i];
 			x = trace[0];
 			y = trace[1];
 			fill = trace[2];
 			ctx.fillStyle = fill; // make a circle
 			ctx.beginPath();
-			var size = 10;
-			//ctx.fillRect(x-size/2, y-size/2, size, size);
-			ctx.arc(x, y, size*.5, 0, Math.TAU, true);
+			ctx.arc(x, y, size_radius, 0, Math.TAU, true);
 			ctx.fill();
 			ctx.stroke();
 		}
@@ -234,11 +225,3 @@ function Model(config){
 
 };
 
-function _clone(obj) {
-    if (null == obj || "object" != typeof obj) return obj;
-    var copy = obj.constructor();
-    for (var attr in obj) {
-        if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
-    }
-    return copy;
-}

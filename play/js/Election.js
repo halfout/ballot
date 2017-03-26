@@ -406,7 +406,6 @@ var _colorWinner = function(model, winner){
 	} else {
 		var color = (winner) ? Candidate.graphics[winner].fill : "";
 	}
-	model.winnerColor[0] = color;
 	model.tracernewfromelection = [];
 	for(var i=0; i<model.candidates.length; i++){
 		var c = model.candidates[i];
@@ -415,8 +414,6 @@ var _colorWinner = function(model, winner){
 	}
 	model.canvas.style.borderColor = color;
 	return color;
-	// I notice that I never add any ties to the tracer
-	// so the pattern recognition handles ties.
 }
 
 function _tietext(winners) {
