@@ -31,7 +31,11 @@
 <script type="text/javascript">
 
 var data, labels, N, color_labels = ['rgb(150, 250, 150)','rgb(250, 150, 150)'];
-var ss = 50.0; // scale for drawing
+var ss = 300; // scale for drawing
+var flag_dont_clear_tracer = true;
+var delaycounter = 0;
+var ncase_called_draw = false;
+var nn_called_draw = false;
 
 // create neural net
 var layer_defs, net, trainer;
@@ -40,7 +44,7 @@ layer_defs = [];\n\
 layer_defs.push({type:'input', out_sx:1, out_sy:1, out_depth:2});\n\
 layer_defs.push({type:'fc', num_neurons:6, activation: 'tanh'});\n\
 layer_defs.push({type:'fc', num_neurons:2, activation: 'tanh'});\n\
-layer_defs.push({type:'softmax', num_classes:4});\n\
+layer_defs.push({type:'softmax', num_classes:5});\n\
 \n\
 net = new convnetjs.Net();\n\
 net.makeLayers(layer_defs);\n\
@@ -145,7 +149,7 @@ data = [];
   var i = 0;
   color_labels = [];
   for(k in model.tracer) {
-	data.push([model.tracer[k][0]/100-4,model.tracer[k][1]/100-4]);
+	data.push([(model.tracer[k][0]-300)/ss,(model.tracer[k][1]-300)/ss]);
 	var f_star = model.tracer[k][2] ;
 	if (!(f_star in type_a)) {
 		type_a[f_star] = i;
@@ -209,16 +213,26 @@ function cycle() {
   $("#cyclestatus").html('drawing neurons ' + d0 + ' and ' + d1 + ' of layer #' + lix + ' (' + net.layers[lix].layer_type + ')');
 }
 
+function draw(){
+	// need to let ncase's model's draw function call draw2
+	flag_dont_clear_tracer = true;
+	model.update();
+}
+
 var lix = 4; // layer id to track first 2 neurons of
 var d0 = 0; // first dimension to show visualized
 var d1 = 1; // second dimension to show visualized
-function draw(){
-    
-    ctx.clearRect(0,0,WIDTH,HEIGHT);
+function draw2(){
+	//if (delaycounter < 10) { delaycounter++; return;}
+	
+    ctx2 = model.ctx;
+	WIDTH = ctx2.canvas.width;
+	HEIGHT = ctx2.canvas.height;
+    ctx2.clearRect(0,0,WIDTH,HEIGHT);
     
     var netx = new convnetjs.Vol(1,1,2);
     // draw decisions in the grid
-    var density= 5.0;
+    var density= 10.0;
     var gridstep = 2;
     var gridx = [];
     var gridy = [];
@@ -233,15 +247,15 @@ function draw(){
 		
 		var c_max = Math.max.apply(null, a.w);
 		var d_max = a.w.indexOf(c_max);
-		ctx.fillStyle = color_labels[d_max];
+		ctx2.fillStyle = color_labels[d_max];
 		
-        // if(a.w[0] > a.w[1]) ctx.fillStyle = 'rgb(250, 150, 150)';
-        // else ctx.fillStyle = 'rgb(150, 250, 150)';
+        // if(a.w[0] > a.w[1]) ctx2.fillStyle = 'rgb(250, 150, 150)';
+        // else ctx2.fillStyle = 'rgb(150, 250, 150)';
 	  
 
-        //ctx.fillStyle = 'rgb(150,' + Math.floor(a.w[0]*105)+150 + ',150)';
-        //ctx.fillStyle = 'rgb(' + Math.floor(a.w[0]*255) + ',' + Math.floor(a.w[1]*255) + ', 0)';
-        ctx.fillRect(x-density/2-1, y-density/2-1, density+2, density+2);
+        //ctx2.fillStyle = 'rgb(150,' + Math.floor(a.w[0]*105)+150 + ',150)';
+        //ctx2.fillStyle = 'rgb(' + Math.floor(a.w[0]*255) + ',' + Math.floor(a.w[1]*255) + ', 0)';
+        ctx2.fillRect(x-density/2-1, y-density/2-1, density+2, density+2);
 
         if(cx%gridstep === 0 && cy%gridstep===0) {
           // record the transformation information
@@ -258,14 +272,14 @@ function draw(){
     }
 
     // draw axes
-    ctx.beginPath();
-    ctx.strokeStyle = 'rgb(50,50,50)';
-    ctx.lineWidth = 1;
-    ctx.moveTo(0, HEIGHT/2);
-    ctx.lineTo(WIDTH, HEIGHT/2);
-    ctx.moveTo(WIDTH/2, 0);
-    ctx.lineTo(WIDTH/2, HEIGHT);
-    ctx.stroke();
+    ctx2.beginPath();
+    ctx2.strokeStyle = 'rgb(50,50,50)';
+    ctx2.lineWidth = 1;
+    ctx2.moveTo(0, HEIGHT/2);
+    ctx2.lineTo(WIDTH, HEIGHT/2);
+    ctx2.moveTo(WIDTH/2, 0);
+    ctx2.lineTo(WIDTH/2, HEIGHT);
+    ctx2.stroke();
 
     // draw representation transformation axes for two neurons at some layer
     var mmx = cnnutil.maxmin(gridx);
@@ -319,13 +333,13 @@ function draw(){
     visctx.stroke();
 
     // draw datapoints.
-    ctx.strokeStyle = 'rgb(0,0,0)';
-    ctx.lineWidth = 1;
+    ctx2.strokeStyle = 'rgb(0,0,0)';
+    ctx2.lineWidth = 1;
     for(var i=0;i<N;i++) {
       
-      //if(labels[i]==1) ctx.fillStyle = 'rgb(100,200,100)';
-      //else ctx.fillStyle = 'rgb(200,100,100)';
-	  ctx.fillStyle = color_labels[labels[i]];
+      //if(labels[i]==1) ctx2.fillStyle = 'rgb(100,200,100)';
+      //else ctx2.fillStyle = 'rgb(200,100,100)';
+	  ctx2.fillStyle = color_labels[labels[i]];
       drawCircle(data[i][0]*ss+WIDTH/2, data[i][1]*ss+HEIGHT/2, 5.0);
 
       // also draw transformed data points while we're at it
@@ -343,6 +357,13 @@ function draw(){
       visctx.stroke();
       visctx.fill();
     }
+	
+	//flag_dont_clear_tracer = true;
+	//if (! ncase_called_draw) {
+	//	nn_called_draw = true;
+	//	model.update();
+	//	nn_called_draw = false;
+	//}
 }
 
 function mouseClick(x, y, shiftPressed, ctrlPressed){
@@ -396,7 +417,7 @@ $(function() {
     circle_data();
     $("#layerdef").val(t);
     reload();
-    NPGinit(20);
+    NPGinit(10);
 
 });
 </script>
