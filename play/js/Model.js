@@ -90,74 +90,112 @@ function Model(config){
 	self.tracerold = Array.apply(null, Array(5)).map(function(){return [0,0,'rgb(0,0,0)']});
 	self.tracernewfromelection = self.tracerold;	
 	self.tracer = self.tracerold;
-	self.me_moving_new = 0;
+	self.me_moving_new = 1;
+	self.me_moving_old = 1;
 	self.hasyee = false;
 	self.gridx = [];
 	self.gridy = [];
 	self.gridl = [];
-
+	self.config_old = [];
+	self.config_new = [];
+	self.counter = 0;
+	self.doingyee = false;
 	self.update = function(){
 	
 		// Clear it all!
 		ctx.clearRect(0,0,canvas.width,canvas.height); // keep it if we are dragging something
 		
+		var flag_draw_tracer = false;
 		var density= 10.0;
 				
 		// Move the one that's being dragged, if any
-		if(Mouse.dragging){
+		for(var j=0; j<self.voters.length; j++){
+			var voter = self.voters[j];
+			voter.update();
+		}
+		for(var j=0; j<self.candidates.length; j++){
+			var c = self.candidates[j];
+			c.update();
+		}
+		var mouse_move = Mouse.dragging ? 1 : 0;
+		if (mouse_move){
+		self.me_moving_old = self.me_moving_new;
+		var min_length = Math.min(self.candidates.length,self.tracerold.length,self.tracernewfromelection.length);
+		for(var i=0; i<min_length; i++){ // see if the new tracer is in a different position.  only keep new positions.
+			if (self.tracerold[i][0] != self.tracernewfromelection[i][0] | self.tracerold[i][1] != self.tracernewfromelection[i][1]) {				
+				self.tracer.push(self.tracernewfromelection[i]);
+				self.me_moving_new = i;  // self.me_moving_new = Mouse.dragging.id;  This makes everything very slow!
+			}
+		}
+		}
+		
+		if(mouse_move){
 			Mouse.dragging.moveTo(Mouse.x, Mouse.y);
-			for(var j=0; j<self.voters.length; j++){
-				var voter = self.voters[j];
-				voter.update();
-			}
-			for(var j=0; j<self.candidates.length; j++){
-				var c = self.candidates[j];
-				c.update();
-			}
-			
-			self.me_moving_old = self.me_moving_new;
-			for(var i=0; i<self.candidates.length; i++){ // see if the new tracer is in a different position.  only keep new positions.
-				if (self.tracerold[i][0] != self.tracernewfromelection[i][0] | self.tracerold[i][1] != self.tracernewfromelection[i][1]) {				
-					self.tracer.push(self.tracernewfromelection[i]);
-					self.me_moving_new = i;
-				}
-			}
-			i--;
-			self.tracerold = self.tracernewfromelection; // clean up for next time
-			if (self.me_moving_new != self.me_moving_old) { 
-				self.tracer = []; // if we changed shapes, then erase tracer history
-				
-				WIDTH = ctx.canvas.width; // draw yee diagram
-				HEIGHT = ctx.canvas.height;
-				oldx = Mouse.dragging.x;
-				oldy = Mouse.dragging.y;
-				self.gridx = [];
-				self.gridy = [];
-				self.gridl = []; 
-				for(var x=0.0, cx=0; x<=WIDTH; x+= density, cx++) {
-				  for(var y=0.0, cy=0; y<=HEIGHT; y+= density, cy++) {
-					Mouse.dragging.x = x*.5;
-					Mouse.dragging.y = y*.5;  // don't use Draggable.moveTo because it adds an offset
-					model.election(model, {sidebar:false});
- 					for(var j=0; j<self.voters.length; j++){
- 						var voter = self.voters[j];
- 						voter.update();
- 					}
-					var a = self.tracernewfromelection[self.me_moving_new][2];
-				    self.gridx.push(x);
-				    self.gridy.push(y);
-				    self.gridl.push(a);
-					// model.caption.innerHTML = "Calculating " + Math.round(x/WIDTH*100) + "%"; // doesn't work yet 
-				  }
-				}
-				Mouse.dragging.x = oldx;
-				Mouse.dragging.y = oldy;
-				self.hasyee=true;
-			}
-			//self.tracer = self.tracer.slice(-400); // keep tracer short
 		} else {
 			self.tracer = [];
+		}			
+		self.me_moving_new = self.me_moving_new % self.candidates.length;
+		var newshape = self.me_moving_new != self.me_moving_old;
+		//var configchanged = self.tracerold[self.me_moving_new][0] == self.tracernewfromelection[self.me_moving_new][0] & self.tracerold[self.me_moving_new][1] == self.tracernewfromelection[self.me_moving_new][1]; // we know we're inside an update, so any update other than a position change is a config change
+		if (!mouse_move) {
+			self.config_new = [self.numOfCandidates*1,self.numofVoters*1,self.voterType.name+"id"];
 		}
+		var configchanged = self.config_old != self.config_new;
+		if ( !mouse_move | (newshape | configchanged ) ) {  // figure out if we need to recalculate the yee diagram
+			//  if we changed which shape we are dragging,
+			// or if we are updating and we haven't moved (which means a configuration changed)
+			self.tracer = []; // if we changed shapes, then erase tracer history
+			//console.log("redid"+self.counter);
+			self.counter++;
+			WIDTH = ctx.canvas.width; // draw yee diagram
+			HEIGHT = ctx.canvas.height;
+			if (mouse_move) {
+				oldx = Mouse.dragging.x;
+				oldy = Mouse.dragging.y;
+			} else {
+				oldx = self.candidates[self.me_moving_new].x
+				oldy = self.candidates[self.me_moving_new].y
+			}
+			self.doingyee = true;
+			self.gridx = [];
+			self.gridy = [];
+			self.gridl = []; 
+			for(var x=0.0, cx=0; x<=WIDTH; x+= density, cx++) {
+			  for(var y=0.0, cy=0; y<=HEIGHT; y+= density, cy++) {
+				if(mouse_move) {
+					Mouse.dragging.x = x*.5;
+					Mouse.dragging.y = y*.5;  // don't use Draggable.moveTo because it adds an offset
+				} else {
+					self.candidates[self.me_moving_new].x = x*.5;
+					self.candidates[self.me_moving_new].y = y*.5;
+				}
+				model.election(model, {sidebar:false});
+				for(var j=0; j<self.voters.length; j++){
+					var voter = self.voters[j];
+					voter.update();
+				}
+				var a = self.tracernewfromelection[self.me_moving_new][2];
+				self.gridx.push(x);
+				self.gridy.push(y);
+				self.gridl.push(a);
+				// model.caption.innerHTML = "Calculating " + Math.round(x/WIDTH*100) + "%"; // doesn't work yet 
+			  }
+			}
+			self.doingyee = false;
+			if(mouse_move) {
+					Mouse.dragging.x = oldx;
+					Mouse.dragging.y = oldy;  // don't use Draggable.moveTo because it adds an offset
+				} else {
+					self.candidates[self.me_moving_new].x = oldx;
+					self.candidates[self.me_moving_new].y = oldy;
+				}
+			self.hasyee=true;
+		}
+		if (mouse_move) {
+		self.tracerold = self.tracernewfromelection; // clean up for next time
+		}
+		//self.tracer = self.tracer.slice(-400); // keep tracer short
+		self.config_old = self.config_new;
 
 		// DRAW 'EM ALL.
 		// Draw voters' BG first, then candidates, then voters.
@@ -170,23 +208,25 @@ function Model(config){
 		}	
 
 		// Draw tracer
-		ctx.strokeStyle = 'rgb(0,0,0)';
-		ctx.lineWidth = 1; // border around tracer
-    
-		var size_radius = 5;
-		var trace, x, y, fill;
-		for(var i=0; i<self.tracer.length; i++){
-			trace = self.tracer[i];
-			x = trace[0];
-			y = trace[1];
-			fill = trace[2];
-			ctx.fillStyle = fill; // make a circle
-			ctx.beginPath();
-			ctx.arc(x, y, size_radius, 0, Math.TAU, true);
-			ctx.fill();
-			ctx.stroke();
-		}
+		if (flag_draw_tracer) {
+			ctx.strokeStyle = 'rgb(0,0,0)';
+			ctx.lineWidth = 1; // border around tracer
 		
+			var size_radius = 5;
+			var trace, x, y, fill;
+			for(var i=0; i<self.tracer.length; i++){
+				trace = self.tracer[i];
+				x = trace[0];
+				y = trace[1];
+				fill = trace[2];
+				ctx.fillStyle = fill; // make a circle
+				ctx.beginPath();
+				ctx.arc(x, y, size_radius, 0, Math.TAU, true);
+				ctx.fill();
+				ctx.stroke();
+			}
+		}
+			
 		for(var i=0; i<self.voters.length; i++){
 			var voter = self.voters[i];
 			voter.update();

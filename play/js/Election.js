@@ -43,7 +43,10 @@ Election.score = function(model, options){
 		text += "<br>";
 		text += "<b style='color:"+color+"'>"+winner.toUpperCase()+"</b> WINS";
 	}
-	model.caption.innerHTML = text;
+	
+	if (!model.doingyee) {
+		model.caption.innerHTML = text;
+	}
 
 };
 
@@ -78,7 +81,10 @@ Election.approval = function(model, options){
 		text += "<br>";
 		text += "<b style='color:"+color+"'>"+winner.toUpperCase()+"</b> WINS";
 	}
-	model.caption.innerHTML = text;
+	
+	if (!model.doingyee) {
+		model.caption.innerHTML = text;
+	}
 };
 
 Election.condorcet = function(model, options){
@@ -165,8 +171,9 @@ Election.condorcet = function(model, options){
 
 	// what's the loop?
 
-	model.caption.innerHTML = text;
-
+	if (!model.doingyee) {
+		model.caption.innerHTML = text;
+	}
 };
 
 Election.borda = function(model, options){
@@ -201,8 +208,9 @@ Election.borda = function(model, options){
 		text += "<br>";
 		text += "<b style='color:"+color+"'>"+winner.toUpperCase()+"</b> WINS";
 	}
-	model.caption.innerHTML = text;
-
+	if (!model.doingyee) {
+		model.caption.innerHTML = text;
+	}
 };
 
 Election.irv = function(model, options){
@@ -249,8 +257,8 @@ Election.irv = function(model, options){
 		var winner = winners[0];
 		var ratio = tally[winner]/model.getTotalVoters();
 		if(ratio>0.5){
-			if (winners.length >= 2) {		
-				finalWinner = "tie";
+			if (winners.length >= 2) {	// won't happen bc ratio > .5	
+				finalWinner = "tie"; 
 				break;
 			}
 			finalWinner = winner;
@@ -261,26 +269,31 @@ Election.irv = function(model, options){
 		// Otherwise... runoff...
 		var losers = _countLoser(tally);
 		var loser = losers[0];
-		if (losers.length >= 2) {finalWinner = "elimination tie"; break;}
-		text += "nobody's more than 50%. ";
-		text += "eliminate loser, "+_icon(loser)+". next round!<br><br>";
+		if (losers.length >= 2 & losers.length >= Object.keys(tally).length) {finalWinner = "tie"; break;}
 
 		// ACTUALLY ELIMINATE
-		candidates.splice(candidates.indexOf(loser), 1); // remove from candidates...
-		var ballots = model.getBallots();
-		for(var i=0; i<ballots.length; i++){
-			var rank = ballots[i].rank;
-			rank.splice(rank.indexOf(loser), 1); // REMOVE THE LOSER
+		
+		for (var li = 0; li < losers.length ; li++ ) {
+			loser = losers[li];
+			text += "nobody's more than 50%. ";
+			text += "eliminate loser, "+_icon(loser)+". next round!<br><br>";
+			candidates.splice(candidates.indexOf(loser), 1); // remove from candidates...
+			var ballots = model.getBallots();
+			for(var i=0; i<ballots.length; i++){
+				var rank = ballots[i].rank;
+				rank.splice(rank.indexOf(loser), 1); // REMOVE THE LOSER
+			}			
+			// And repeat!
+			roundNum++;
 		}
 
-		// And repeat!
-		roundNum++;
 	
 	}
+	var color = _colorWinner(model, "tie");
 	if (finalWinner == "tie") {
 		var color = _colorWinner(model, "tie");
 		text += _tietext(winners);
-	} else if (finalWinner == "elimination tie") {
+	} else if (finalWinner == "elimination tie") { // wont happen
 		var color = _colorWinner(model, "tie");
 		text += "who is the loser?";
 		text += _tietext(losers);
@@ -291,7 +304,9 @@ Election.irv = function(model, options){
 		text += "<br>";
 		text += "<b style='color:"+color+"'>"+winner.toUpperCase()+"</b> WINS";	
 	}
-	model.caption.innerHTML = text;
+	if (!model.doingyee) {
+		model.caption.innerHTML = text;
+	}
 };
 
 Election.plurality = function(model, options){
@@ -336,8 +351,9 @@ Election.plurality = function(model, options){
 		text += _tietext(winners);
 	}
 	
-	model.caption.innerHTML = text;
-
+	if (!model.doingyee) {
+		model.caption.innerHTML = text;
+	}
 };
 
 var _tally = function(model, tallyFunc){

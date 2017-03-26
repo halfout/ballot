@@ -297,12 +297,14 @@ function PluralityVoter(model){
 		// What fill?
 		var fill = Candidate.graphics[ballot.vote].fill;
 		ctx.fillStyle = fill;
+		ctx.strokeStyle = 'rgb(0,0,0)';
+		ctx.lineWidth = 1; // border
 
 		// Just draw a circle.
 		ctx.beginPath();
 		ctx.arc(x, y, size, 0, Math.TAU, true);
 		ctx.fill();
-
+		ctx.stroke();
 	};
 
 }
@@ -315,6 +317,7 @@ var _drawSlices = function(ctx, x, y, size, slices, totalSlices){
 	y = y*2;
 	//size = size*2;
 
+	
 	// GO AROUND THE CLOCK...
 	var startingAngle = -Math.TAU/4;
 	var endingAngle = 0;
@@ -339,6 +342,14 @@ var _drawSlices = function(ctx, x, y, size, slices, totalSlices){
 		startingAngle = endingAngle;
 
 	}
+	
+	// Just draw a circle.		
+	ctx.strokeStyle = 'rgb(0,0,0)';
+	ctx.lineWidth = 1; // border
+	ctx.beginPath();
+	ctx.arc(x, y, size, 0, Math.TAU, true);
+	ctx.closePath();
+	ctx.stroke();
 
 };
 var _drawBlank = function(ctx, x, y, size){
