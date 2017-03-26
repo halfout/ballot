@@ -207,11 +207,12 @@ function Model(config){
 							self.candidates[self.me_moving_new].y = y*.5;
 						}
 					}
-					model.election(model, {sidebar:false});
 					for(var j=0; j<self.voters.length; j++){
 						var voter = self.voters[j];
 						voter.update();
 					}
+					model.election(model, {sidebar:false});
+					
 					var a = self.tracernewfromelection[self.me_moving_new][2];
 					self.gridx.push(x);
 					self.gridy.push(y);
