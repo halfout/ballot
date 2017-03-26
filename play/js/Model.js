@@ -90,6 +90,7 @@ function Model(config){
 	self.tracerold = Array.apply(null, Array(5)).map(function(){return [0,0,0]});
 	self.me_moving_new = 0;
 	self.tracer = Array.apply(null, Array(50)).map(function(){return [0,0,0]});
+	self.winnerColor = [];
 	//self.tracer = [];
 	self.update = function(){
 	
@@ -99,7 +100,8 @@ function Model(config){
 		// Move the one that's being dragged, if any
 		if(Mouse.dragging){
 			Mouse.dragging.moveTo(Mouse.x, Mouse.y);
-			var fill = model.canvas.style.borderColor; // this modification traces the history of who won
+			var fill = model.canvas.style.borderColor;
+			var fill = self.winnerColor[0]; //_clone(self.winnerColor); // this modification traces the history of who won
 			var tracernew = []
 			self.me_moving_old = self.me_moving_new;
 			for(var i=0; i<self.candidates.length; i++){
@@ -117,14 +119,24 @@ function Model(config){
 			}
 			self.tracer = self.tracer.slice(-400);
 			//self.tracer.splice(0,Math.abs(self.tracer.length-10));
+			spiral_data(); // get the additional data from dragging
 		} else {
-			self.tracer = [];
+			if ( ! flag_dont_clear_tracer) {self.tracer = [];ctx.clearRect(0,0,canvas.width,canvas.height);}
+			flag_dont_clear_tracer = false;
 		}
 
+		
+		
 		// DRAW 'EM ALL.
 		// Draw voters' BG first, then candidates, then voters.
 		
+		// Draw nn
+		draw2();
+		
 		// Draw tracer
+		ctx.strokeStyle = 'rgb(0,0,0)';
+		ctx.lineWidth = 1;
+    
 		for(var i=0; i<self.tracer.length; i++){
 			var trace = self.tracer[i];
 			x = trace[0];
@@ -133,12 +145,11 @@ function Model(config){
 			ctx.fillStyle = fill; // make a circle
 			ctx.beginPath();
 			var size = 10;
-			ctx.fillRect(x-size/2, y-size/2, size, size);
-			//ctx.arc(x, y, size, 0, Math.TAU, true);
+			//ctx.fillRect(x-size/2, y-size/2, size, size);
+			ctx.arc(x, y, size*.5, 0, Math.TAU, true);
 			ctx.fill();
+			ctx.stroke();
 		}
-		
-		spiral_data();
 		
 		for(var i=0; i<self.voters.length; i++){
 			var voter = self.voters[i];
@@ -175,4 +186,14 @@ function Model(config){
 		return count;
 	};
 
+
 };
+
+function _clone(obj) {
+    if (null == obj || "object" != typeof obj) return obj;
+    var copy = obj.constructor();
+    for (var attr in obj) {
+        if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+    }
+    return copy;
+}
