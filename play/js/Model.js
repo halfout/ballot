@@ -144,14 +144,14 @@ function Model(config){
 		}
 		var mouse_move = Mouse.dragging ? 1 : 0;
 		if (mouse_move){
-		self.me_moving_old = self.me_moving_new;
-		var min_length = Math.min(self.candidates.length,self.tracerold.length,self.tracernewfromelection.length);
-		for(var i=0; i<min_length; i++){ // see if the new tracer is in a different position.  only keep new positions.
-			if (self.tracerold[i][0] != self.tracernewfromelection[i][0] | self.tracerold[i][1] != self.tracernewfromelection[i][1]) {				
-				self.tracer.push(self.tracernewfromelection[i]);
-				self.me_moving_new = i;  // self.me_moving_new = Mouse.dragging.id;  This makes everything very slow!
+			self.me_moving_old = self.me_moving_new;
+			var min_length = Math.min(self.candidates.length,self.tracerold.length,self.tracernewfromelection.length);
+			for(var i=0; i<min_length; i++){ // see if the new tracer is in a different position.  only keep new positions.
+				if (self.tracerold[i][0] != self.tracernewfromelection[i][0] | self.tracerold[i][1] != self.tracernewfromelection[i][1]) {				
+					self.tracer.push(self.tracernewfromelection[i]);
+					self.me_moving_new = i;  // self.me_moving_new = Mouse.dragging.id;  This makes everything very slow!
+				}
 			}
-		}
 		}
 		
 		if(mouse_move){
@@ -194,7 +194,7 @@ function Model(config){
 				self.gridy = [];
 				self.gridl = []; 
 				for(var x=0.0, cx=0; x<=WIDTH; x+= density, cx++) {
-				  for(var y=0.0, cy=0; y<=HEIGHT; y+= density, cy++) {
+				  for(var y=0.0, cy=0; y<=HEIGHT; y+= density, cy++) { // in the future, we could use this kind of loop to make an animation. all we would need to add would be something like Mouse.dragging.moveTo(Mouse.x, Mouse.y); from above.  Could be easy.
 					if(dynamic_yee) {
 						self.candidates[1].x = x*.5;
 						self.candidates[1].y = y*.5;
