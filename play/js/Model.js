@@ -253,7 +253,13 @@ function Model(config){
 				ctx.fillStyle = self.gridl[k];
 				ctx.fillRect(self.gridx[k]-density*.5-1, self.gridy[k]-density*.5-1, density+2, density+2);
 			}
-		}	
+			// Draw axes
+			var background = new Image();
+			background.src = "../play/img/axis_transparent.png";
+			ctx.drawImage(background,0,0);
+		}
+
+		
 
 		// Draw tracer
 		if (flag_draw_tracer) {
