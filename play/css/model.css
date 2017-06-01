@@ -30,7 +30,6 @@ THE MAIN MODEL ITSELF
 	float:left;
 }
 .model .interactive{
-    background-image: url(../img/axis.png);
     background-size: 100% 100%;
     border: 2px solid #ccc;
 }

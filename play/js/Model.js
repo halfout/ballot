@@ -119,6 +119,15 @@ function Model(config){
 		self.yeeon = false;
 		model.update();
 	}	
+	self.popon = true;
+	self.TurnOnPop = function() {
+		self.popon = true;
+		model.update();
+	}	
+	self.TurnOffPop = function() {
+		self.popon = false;
+		model.update();
+	}
 	self.votersmovedold = 0;
 	self.update = function(){
 	
@@ -247,6 +256,15 @@ function Model(config){
 
 		// DRAW 'EM ALL.
 		// Draw voters' BG first, then candidates, then voters.
+
+		// Draw axes
+		var background = new Image();
+		if (self.popon) {
+			background.src = "../play/img/axis.png";
+		} else {
+			background.src = "../play/img/axis_2d.png";
+		}
+		ctx.drawImage(background,0,0);
 		
 		if(self.yeeon & self.hasyee){
 			for(var k=0;k<self.gridx.length;k++) {
@@ -255,7 +273,11 @@ function Model(config){
 			}
 			// Draw axes
 			var background = new Image();
-			background.src = "../play/img/axis_transparent.png";
+			if (self.popon) {
+				background.src = "../play/img/axis_transparent.png";
+			} else {
+				background.src = "../play/img/axis_2d_white.png";
+			}
 			ctx.drawImage(background,0,0);
 		}
 

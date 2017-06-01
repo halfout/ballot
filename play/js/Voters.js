@@ -45,7 +45,11 @@ function ScoreVoter(model){
 			var c = self.model.candidates[i];
 			var dx = c.x-x;
 			var dy = c.y-y;
-			var dist = Math.sqrt(Math.abs(popularity_distance(dx,c.y)*200))-40; // Math.sqrt(dx*dx+dy*dy);    // I change the distance.
+			if (self.model.popon) {
+				var dist = Math.sqrt(Math.abs(popularity_distance(dx,c.y)*200))-40; // Math.sqrt(dx*dx+dy*dy);    // I change the distance.
+			} else {
+				var dist = Math.sqrt(dx*dx+dy*dy);
+			}
 			scores[c.id] = self.getScore(dist);
 		}
 		
@@ -115,7 +119,11 @@ function ApprovalVoter(model){
 			var c = self.model.candidates[i];
 			var dx = c.x-x;
 			var dy = c.y-y;
-			var dist = popularity_distance(dx,c.y); // Math.sqrt(dx*dx+dy*dy);    // I change the distance.
+			if (self.model.popon) {
+				var dist = popularity_distance(dx,c.y); // Math.sqrt(dx*dx+dy*dy);    // I change the distance.
+			} else {
+				var dist = Math.sqrt(dx*dx+dy*dy);
+			}
 			if(dist<self.approvalRadius){
 				approved.push(c.id);
 			}
@@ -178,12 +186,20 @@ function RankedVoter(model){
 			var c1 = self.model.candidatesById[a];
 			var x1 = c1.x-x;
 			var y1 = c1.y-y;
-			var d1 = popularity_distance(x1,c1.y); // x1*x1+y1*y1;    // I change the distance.
+			if (self.model.popon) {
+				var d1 = popularity_distance(x1,c1.y); // x1*x1+y1*y1;    // I change the distance.
+			} else {
+				var d1 = Math.sqrt(x1*x1+y1*y1);
+			}
 
 			var c2 = self.model.candidatesById[b];
 			var x2 = c2.x-x;
 			var y2 = c2.y-y;
-			var d2 = popularity_distance(x2,c2.y); // x2*x2+y2*y2;    // I change the distance.
+			if (self.model.popon) {
+				var d2 = popularity_distance(x2,c2.y); // x2*x2+y2*y2;    // I change the distance.
+			} else {
+				var d2 = Math.sqrt(x2*x2+y2*y2);
+			}
 
 			return d1-d2;
 
@@ -256,7 +272,11 @@ function PluralityVoter(model){
 			var c = self.model.candidates[j];
 			var dx = c.x-x;
 			var dy = c.y-y;
-			var dist = popularity_distance(dx,c.y); // dx*dx+dy*dy;    // I change the distance.
+			if (self.model.popon) {
+				var dist = popularity_distance(dx,c.y); // dx*dx+dy*dy;    // I change the distance.
+			} else {
+				var dist = Math.sqrt(dx*dx + dy*dy);
+			}
 			if(dist<closestDistance){
 				closestDistance = dist;
 				closest = c;
