@@ -302,7 +302,22 @@ function Model(config){
 				ctx.stroke();
 			}
 		}
-			
+
+		// make the candidate that is moving say "yee-yee!"
+		if (votersmoved) {
+			var x = Mouse.dragging.x;
+			var y = Mouse.dragging.y;
+		} else {
+			var x = self.candidates[self.me_moving_new].x;
+			var y = self.candidates[self.me_moving_new].y;
+		}
+		ctx.beginPath();
+		ctx.arc(x*2, y*2, 50, 0, Math.TAU, true);
+		ctx.strokeStyle = "white";
+		ctx.stroke();
+
+		
+		
 		for(var i=0; i<self.voters.length; i++){
 			var voter = self.voters[i];
 			voter.update();
@@ -313,6 +328,13 @@ function Model(config){
 			c.update();
 			c.draw(ctx);
 		}
+		
+		ctx.font = "25px Arial";
+		ctx.fillStyle = "white";
+		ctx.textAlign = "center";
+		ctx.fillText("yee-yee!",x*2,y*2);		
+		
+				
 
 		// Update!
 		self.onUpdate();
