@@ -141,7 +141,8 @@ function Model(config){
 			var density= 10.0;
 		}
 		var flag_draw_tracer = false;
-				
+		
+		
 		// Move the one that's being dragged, if any
 		for(var j=0; j<self.voters.length; j++){
 			var voter = self.voters[j];
@@ -151,6 +152,7 @@ function Model(config){
 			var c = self.candidates[j];
 			c.update();
 		}
+		
 		var mouse_move = Mouse.dragging ? 1 : 0;
 		if (mouse_move){
 			self.me_moving_old = self.me_moving_new;
@@ -304,18 +306,19 @@ function Model(config){
 		}
 
 		// make the candidate that is moving say "yee-yee!"
-		if (votersmoved) {
-			var x = Mouse.dragging.x;
-			var y = Mouse.dragging.y;
-		} else {
-			var x = self.candidates[self.me_moving_new].x;
-			var y = self.candidates[self.me_moving_new].y;
+		if(self.yeeon & self.hasyee){
+			if (votersmoved) {
+				var x = Mouse.dragging.x;
+				var y = Mouse.dragging.y;
+			} else {
+				var x = self.candidates[self.me_moving_new].x;
+				var y = self.candidates[self.me_moving_new].y;
+			}
+			ctx.beginPath();
+			ctx.arc(x*2, y*2, 50, 0, Math.TAU, true);
+			ctx.strokeStyle = "white";
+			ctx.stroke();
 		}
-		ctx.beginPath();
-		ctx.arc(x*2, y*2, 50, 0, Math.TAU, true);
-		ctx.strokeStyle = "white";
-		ctx.stroke();
-
 		
 		
 		for(var i=0; i<self.voters.length; i++){
@@ -329,11 +332,12 @@ function Model(config){
 			c.draw(ctx);
 		}
 		
-		ctx.font = "25px Arial";
-		ctx.fillStyle = "white";
-		ctx.textAlign = "center";
-		ctx.fillText("yee-yee!",x*2,y*2);		
-		
+		if(self.yeeon & self.hasyee){
+			ctx.font = "25px Arial";
+			ctx.fillStyle = "white";
+			ctx.textAlign = "center";
+			ctx.fillText("yee-yee!",x*2,y*2);		
+		}
 				
 
 		// Update!
