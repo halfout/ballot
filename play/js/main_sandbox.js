@@ -78,11 +78,11 @@ function main(config){
 			var num = model.numOfVoters;
 			var voterPositions;
 			if(num==1){
-				voterPositions = [[150,20]];
+				voterPositions = [[150,150]];
 			}else if(num==2){
-				voterPositions = [[90,20],[210,20]];
+				voterPositions = [[150,100],[150,200]];
 			}else if(num==3){
-				voterPositions = [[70,20],[150,20],[230,20]];
+				voterPositions = [[150,115],[115,180],[185,180]];
 			}
 			for(var i=0; i<num; i++){
 				var pos = voterPositions[i];

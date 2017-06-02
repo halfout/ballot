@@ -119,7 +119,7 @@ function Model(config){
 		self.yeeon = false;
 		model.update();
 	}	
-	self.popon = true;
+	self.popon = false;
 	self.TurnOnPop = function() {
 		self.popon = true;
 		model.update();
@@ -264,7 +264,7 @@ function Model(config){
 		} else {
 			background.src = "../play/img/axis_2d.png";
 		}
-		ctx.drawImage(background,0,0);
+		// ctx.drawImage(background,0,0);  // eh, I don't like the axis.
 		
 		if(self.yeeon & self.hasyee){
 			for(var k=0;k<self.gridx.length;k++) {
@@ -278,7 +278,7 @@ function Model(config){
 			} else {
 				background.src = "../play/img/axis_2d_white.png";
 			}
-			ctx.drawImage(background,0,0);
+			// ctx.drawImage(background,0,0);  // eh, I don't like the axis.
 		}
 
 		

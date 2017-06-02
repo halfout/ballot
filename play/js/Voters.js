@@ -414,24 +414,7 @@ function GaussianVoters(config){
 	self.points = points;
 	
 	
-	if (config.num == 3) { // so basically, if "one" group of voters is selected, then give a vote line.  I should fix this so that there is an extra option for a vote line.
-		var chx = .07;
-		var xscale = 140;
-		for( var ix=chx; ix <= 1 ; ix+=chx ) {
-				var x = ix * xscale + 0;
-				var y = 0;
-				points.push([x,y]);
-				var x = (ix - .5*chx) * xscale + 0 ;
-				var y = 0 - 10;
-				points.push([x,y]);
-				var x = -ix * xscale+ 0;
-				var y = 0;
-				points.push([x,y]);
-				var x = -(ix - .5*chx) * xscale+ 0 ;
-				var y = 0 - 10;
-				points.push([x,y]);
-			}
-	} else {
+	
 
 	var _radius = 0,
 		_RINGS = spacings.length;
@@ -454,7 +437,6 @@ function GaussianVoters(config){
 		}
 	}
 
-	}
 
 	// UPDATE! Get all ballots.
 	self.ballots = [];

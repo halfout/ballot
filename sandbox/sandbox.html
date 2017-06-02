@@ -10,8 +10,7 @@
 <body>
 	<div id="left"></div>
 	<div id="center"></div>
-	<div id="right">Yee diagrams?<br /> <button id="dynamic" onClick="model.TurnOnYee()">Dynamic!</button>	<button id="static" onClick="model.TurnOffYee()">Static.</button> <button id="static" onClick="model.TurnOffYeeAllTheWay()">Off.</button>
-	<br /><br /> Popularity Axis? <button id="popon" onClick="model.TurnOnPop()">On!</button> <button id="popoff" onClick="model.TurnOffPop()">Off.</button></div>
+	<div id="right">Yee diagrams?<br /> <button id="dynamic" onClick="model.TurnOnYee()">Dynamic!</button>	<button id="static" onClick="model.TurnOffYee()">Static.</button> <button id="static" onClick="model.TurnOffYeeAllTheWay()">Off.</button></div>
 	
 </body>
 </html>
@@ -30,7 +29,7 @@
 <script src="js/main_sandbox.js"></script>
 <script>
 main({
-	description: "[type a description for your model here. for example...]\n\nBasic Instructions:  Move the shapes and dots around and press the buttons.  \n\nThere are a few different modes.  With the popularity axis on, move candidates up or down in popularity and left or right on the political spectrum.  When off, move candidates in a 2-d political spectrum.  \n\nYee diagrams can be static, by which I mean they stay the same as you move a shape.  They basically just tell you which shape wins as you move your shape around.  You can also move the voters and get a yee diagram for them.  There is also dynamic mode, which tells you who wins if the yellow triangle were moved to that spot on the diagram.  Also, turn yee diagrams off for faster performance.  \n\nLook, it's the whole shape gang! Steven Square, Tracy Triangle, Henry Hexagon, Percival Pentagon, and last but not least, Bob.",
+	description: "[type a description for your model here. for example...]\n\nBasic Instructions:  Move the shapes and dots around and press the buttons.  \n\nThere are a few different modes. A Yee diagram shows who wins when a voter moves to a position or a candidate moves to a position.  The color at that position in the diagram says who wins.  Yee diagrams can be static, by which I mean they stay the same as you move a shape.  The position of the shape you're moving is the variable.  You can also move the voters and get a yee diagram for them.  There is also dynamic mode, which changes as you move a shape (with one exception).  Dynamic mode tells uses the position of the yellow triangle as the variable and colors in the diagram with the winner's color.  Also, turn yee diagrams off for faster performance.  \n\nLook, it's the whole shape gang! Steven Square, Tracy Triangle, Henry Hexagon, Percival Pentagon, and last but not least, Bob.",
 	features: 4,
 	system: "FPTP",
 	candidates: 5,
